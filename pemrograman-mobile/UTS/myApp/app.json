@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "myApp",
+    "slug": "myApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/delta.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/delta.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/delta.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/delta.png"
+    }
+  }
+}
