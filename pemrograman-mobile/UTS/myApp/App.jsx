@@ -29,12 +29,12 @@ function DrawerRoutes() {
         drawerLabelStyle: { fontSize: 16 },
       }}
     >
-      <Drawer.Screen name="Home" component={HomeScreen} />
+      {/* <Drawer.Screen name="Home" component={HomeScreen} />
       <Drawer.Screen name="Produk" component={ProdukScreen} />
       <Drawer.Screen name="Riwayat" component={RiwayatScreen} />
       <Drawer.Screen name="Profil" component={ProfilScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
-      <Drawer.Screen name="Drawer" component={DrawerContent} />
+      <Drawer.Screen name="Drawer" component={DrawerContent} /> */}
     </Drawer.Navigator>
   );
 }

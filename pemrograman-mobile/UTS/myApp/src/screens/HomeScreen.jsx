@@ -25,7 +25,7 @@ export default function HomeScreen() {
           paddingBottom: 10,
           paddingTop: 5,
         },
-        tabBarLabelStyle:{
+        tabBarLabelStyle: {
           fontSize: 12,
         },
         tabBarIcon: ({ color, size }) => {
@@ -37,7 +37,7 @@ export default function HomeScreen() {
           } else if (route.name === 'Produk') {
             iconName = 'shopping-bag';
             return <MaterialIcons name={iconName} size={size} color={color} />;
-          } else if (route.name === 'Riwayat') {
+          } else if (route.name === 'Notifikasi') {
             iconName = 'notifications';
             return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === 'Profil') {
@@ -53,7 +53,7 @@ export default function HomeScreen() {
     >
       <Tab.Screen name="HomeMain" component={HomeMain} options={{ title: 'Home' }} />
       <Tab.Screen name="Produk" component={ProductScreen} />
-      <Tab.Screen name="Riwayat" component={OrderScreen} />
+      <Tab.Screen name="Notifikasi" component={OrderScreen} />
       <Tab.Screen name="Profil" component={ProfileScreen} />
     </Tab.Navigator>
   );
