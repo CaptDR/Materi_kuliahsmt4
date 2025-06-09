@@ -32,7 +32,7 @@ export default function LoginScreen({ navigation }) {
       username === storedUser.username &&
       password === storedUser.password
     ) {
-      navigation.navigate('Home'); // pastikan 'Home' sesuai dengan nama screen di navigator
+      navigation.navigate('MainApp'); // pastikan 'Home' sesuai dengan nama screen di navigator
     } else {
       Alert.alert('Gagal', 'Username atau password salah!');
     }

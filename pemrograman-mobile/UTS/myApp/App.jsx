@@ -3,38 +3,60 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
+// Screens
 import StartScreen from './src/screens/StartScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignupScreen';
-import HomeScreen from './src/screens/HomeScreen';
+import HomeMain from './src/screens/HomeScreen'; // Halaman utama setelah login
 import ProdukScreen from './src/screens/ProductScreen';
 import RiwayatScreen from './src/screens/OrderScreen';
 import ProfilScreen from './src/screens/ProfileScreen';
 import SettingsScreen from './src/screens/SettingScreen';
+
+// Custom drawer
 import CustomDrawer from './src/components/CustomDrawer';
-import HomeMain from './src/screens/HomeMain';
-import DrawerContent from './src/components/DrawerContent';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-// Drawer Navigator hanya muncul setelah login
+// Drawer routes untuk setelah login
 function DrawerRoutes() {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawer {...props} />}
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
         drawerActiveTintColor: '#000',
+        drawerInactiveTintColor: '#333',
         drawerLabelStyle: { fontSize: 16 },
       }}
+      initialRouteName="HomeMain"
     >
-      {/* <Drawer.Screen name="Home" component={HomeScreen} />
-      <Drawer.Screen name="Produk" component={ProdukScreen} />
-      <Drawer.Screen name="Riwayat" component={RiwayatScreen} />
-      <Drawer.Screen name="Profil" component={ProfilScreen} />
-      <Drawer.Screen name="Settings" component={SettingsScreen} />
-      <Drawer.Screen name="Drawer" component={DrawerContent} /> */}
+      <Drawer.Screen 
+        name="HomeMain" 
+        component={HomeMain} 
+        options={{ drawerLabel: 'Beranda' }} 
+      />
+      <Drawer.Screen 
+        name="Produk" 
+        component={ProdukScreen} 
+        options={{ drawerLabel: 'Produk' }} 
+      />
+      <Drawer.Screen 
+        name="Riwayat" 
+        component={RiwayatScreen} 
+        options={{ drawerLabel: 'Riwayat' }} 
+      />
+      <Drawer.Screen 
+        name="Profil" 
+        component={ProfilScreen} 
+        options={{ drawerLabel: 'Profil' }} 
+      />
+      <Drawer.Screen 
+        name="Settings" 
+        component={SettingsScreen} 
+        options={{ drawerLabel: 'Pengaturan' }} 
+      />
     </Drawer.Navigator>
   );
 }
@@ -42,12 +64,24 @@ function DrawerRoutes() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Start" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="Start"
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      >
+        {/* Auth screens */}
         <Stack.Screen name="Start" component={StartScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="MainApp" component={DrawerRoutes} />
+
+        {/* Setelah login */}
+        <Stack.Screen 
+          name="MainApp" 
+          component={DrawerRoutes} 
+          options={{ gestureEnabled: false }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
