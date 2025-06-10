@@ -17,15 +17,59 @@ const OrderScreen = () => {
         if (user) {
             const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                const orderList = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+                const orderList = snapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    const orderId = doc.id;
+
+                    // --- DEBUGGING TANGGAL LEBIH LANJUT ---
+                    console.log(`[OrderScreen Debug] Order ID: ${orderId}`);
+                    console.log(`[OrderScreen Debug] Raw date data:`, data.date);
+                    console.log(`[OrderScreen Debug] Type of data.date:`, typeof data.date);
+
+                    if (data.date) {
+                        // Periksa apakah ini objek Timestamp Firestore
+                        if (typeof data.date.toDate === 'function') {
+                            console.log(`[OrderScreen Debug] data.date is a Firestore Timestamp object.`);
+                            try {
+                                const dateObject = data.date.toDate();
+                                console.log(`[OrderScreen Debug] Converted Date object:`, dateObject);
+                                console.log(`[OrderScreen Debug] Formatted date:`, dateObject.toLocaleDateString('id-ID'));
+                            } catch (e) {
+                                console.error(`[OrderScreen Debug] Error converting Timestamp to Date for Order ID ${orderId}:`, e);
+                            }
+                        } else {
+                            console.warn(`[OrderScreen Debug] data.date for Order ID ${orderId} is NOT a Firestore Timestamp object. Its type is:`, typeof data.date);
+                            // Jika Anda yakin ini string tapi Firestore bilang timestamp, mungkin ada transpilation issue
+                            if (typeof data.date === 'string') {
+                                try {
+                                    const dateObject = new Date(data.date);
+                                    if (!isNaN(dateObject.getTime())) { // Check if it's a valid date
+                                        console.log(`[OrderScreen Debug] Data.date is a string, successfully parsed to Date:`, dateObject);
+                                    } else {
+                                        console.log(`[OrderScreen Debug] Data.date is a string, but invalid date.`);
+                                    }
+                                } catch (e) {
+                                    console.error(`[OrderScreen Debug] Error parsing string date for Order ID ${orderId}:`, e);
+                                }
+                            }
+                        }
+                    } else {
+                        console.log(`[OrderScreen Debug] data.date for Order ID ${orderId} is null or undefined.`);
+                    }
+                    // ----------------------------------------
+
+                    return {
+                        id: orderId,
+                        ...data,
+                    };
+                });
                 setOrders(orderList);
                 setLoading(false);
             });
 
             return () => unsubscribe();
+        } else {
+            setLoading(false); // Jika tidak ada user, hentikan loading
         }
     }, []);
 
@@ -47,13 +91,17 @@ const OrderScreen = () => {
                             style={tw`bg-white rounded-xl p-4 mb-3 shadow-md border border-green-200`}
                         >
                             <Text style={tw`text-green-800 font-semibold`}>
-                                {order.product}
+                                {order.product?.name || 'Nama Produk Tidak Tersedia'}
                             </Text>
                             <Text style={tw`text-sm text-green-600`}>
                                 ID Pesanan: {order.id}
                             </Text>
                             <Text style={tw`text-sm text-green-600`}>
-                                Tanggal: {order.date?.toDate().toLocaleDateString('id-ID')}
+                                Tanggal: {
+                                    order.date && typeof order.date.toDate === 'function'
+                                        ? order.date.toDate().toLocaleDateString('id-ID')
+                                        : 'Tanggal tidak tersedia'
+                                }
                             </Text>
                             <Text
                                 style={tw`text-sm font-bold mt-2 ${order.status === 'Selesai'
@@ -61,7 +109,7 @@ const OrderScreen = () => {
                                     : order.status === 'Dikirim'
                                         ? 'text-yellow-600'
                                         : 'text-red-600'}
-                `}
+                                `}
                             >
                                 Status: {order.status}
                             </Text>
