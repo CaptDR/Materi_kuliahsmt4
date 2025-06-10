@@ -1,7 +1,11 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from '../../tailwind';
+import { useNavigation } from '@react-navigation/native';
+import { getAuth } from 'firebase/auth';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 const products = [
   {
@@ -31,8 +35,36 @@ const products = [
 ];
 
 const ProductScreen = () => {
-  const handleBuy = (productName) => {
-    Alert.alert('Pesanan Ditambahkan', `Anda memilih untuk menyewa: ${productName}`);
+  const navigation = useNavigation();
+
+  const handleBuy = async (product) => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        Alert.alert('Gagal', 'Silakan login terlebih dahulu');
+        return;
+      }
+
+      // Simpan pesanan awal ke Firestore
+      const docRef = await addDoc(collection(db, 'orders'), {
+        userId: user.uid,
+        product: product.name,
+        price: product.price,
+        status: 'Belum Dibayar',
+        date: Timestamp.now(),
+      });
+
+      // Navigasi ke halaman Checkout, kirim data produk dan orderId
+      navigation.navigate('Checkout', {
+        product,
+        orderId: docRef.id,
+      });
+    } catch (error) {
+      console.error('Gagal menyimpan pesanan:', error);
+      Alert.alert('Error', 'Terjadi kesalahan saat memproses pesanan');
+    }
   };
 
   return (
@@ -56,7 +88,7 @@ const ProductScreen = () => {
               <Text style={tw`text-sm font-bold text-green-800`}>{item.name}</Text>
               <Text style={tw`text-xs text-green-700 mb-2`}>{item.price}</Text>
               <TouchableOpacity
-                onPress={() => handleBuy(item.name)}
+                onPress={() => handleBuy(item)}
                 style={tw`bg-green-700 py-1 rounded-lg`}
               >
                 <Text style={tw`text-white text-center text-xs font-semibold`}>

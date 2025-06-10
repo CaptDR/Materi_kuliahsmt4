@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import tw from 'twrnc';
 
 import HomeMain from './HomeMain';
 import ProductScreen from './ProductScreen';
@@ -16,18 +16,18 @@ export default function HomeScreen() {
       initialRouteName="HomeMain"
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#ffff', // warna tema Deltaromeo Outdoor
-        tabBarInactiveTintColor: '#f6b042',
-        tabBarStyle: {
-          backgroundColor: '#153932',
-          borderTopWidth: 0,
-          height: 65,
-          paddingBottom: 10,
-          paddingTop: 5,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-        },
+        tabBarActiveTintColor: '#ffff', // warna tema Deltaromeo Outdoor (putih)
+        tabBarInactiveTintColor: '#f6b042', // warna kuning keemasan
+        tabBarStyle: [
+          tw`bg-[#153932]`, // hijau tua khas Deltaromeo
+          {
+            borderTopWidth: 0,
+            height: 65,
+            paddingBottom: 10,
+            paddingTop: 5,
+          },
+        ],
+        tabBarLabelStyle: tw`text-[12px] font-semibold`,
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
@@ -45,16 +45,25 @@ export default function HomeScreen() {
             return <Ionicons name={iconName} size={size} color={color} />;
           }
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-        },
       })}
     >
-      <Tab.Screen name="HomeMain" component={HomeMain} options={{ title: 'Home' }} />
-      <Tab.Screen name="Produk" component={ProductScreen} />
-      <Tab.Screen name="Notifikasi" component={OrderScreen} />
-      <Tab.Screen name="Profil" component={ProfileScreen} />
+      <Tab.Screen
+        name="HomeMain"
+        component={HomeMain}
+        options={{ title: 'Home' }}
+      />
+      <Tab.Screen
+        name="Produk"
+        component={ProductScreen}
+      />
+      <Tab.Screen
+        name="Notifikasi"
+        component={OrderScreen}
+      />
+      <Tab.Screen
+        name="Profil"
+        component={ProfileScreen}
+      />
     </Tab.Navigator>
   );
 }

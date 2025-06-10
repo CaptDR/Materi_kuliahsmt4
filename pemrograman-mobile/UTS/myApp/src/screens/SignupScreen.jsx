@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebaseConfig';
+import tw from 'twrnc';
 
 export default function SignupScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -18,101 +18,61 @@ export default function SignupScreen({ navigation }) {
     }
 
     try {
-      const userData = { username, email, password };
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        username,
+        email,
+        createdAt: new Date(),
+      });
+
       Alert.alert('Sukses', 'Akun berhasil dibuat!');
-      navigation.navigate('Start'); // Kembali ke StartScreen
+      navigation.navigate('Login');
     } catch (error) {
-      Alert.alert('Error', 'Terjadi kesalahan saat menyimpan data!');
       console.error(error);
+      Alert.alert('Gagal Daftar', error.message);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Buat Akun Baru</Text>
+    <View style={tw`flex-1 bg-[#153932] justify-center px-6`}>
+      <Text style={tw`text-white text-2xl mb-4 text-center`}>Buat Akun Baru</Text>
 
       <TextInput
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
-        style={styles.input}
         placeholderTextColor="#aaa"
+        style={tw`bg-[#1c2b3a] text-white px-4 py-3 mb-3 rounded-xl`}
       />
       <TextInput
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        style={styles.input}
         placeholderTextColor="#aaa"
         keyboardType="email-address"
+        autoCapitalize="none"
+        style={tw`bg-[#1c2b3a] text-white px-4 py-3 mb-3 rounded-xl`}
       />
-
-      <View style={styles.passwordContainer}>
+      <View style={tw`flex-row items-center bg-[#1c2b3a] rounded-xl px-4 mb-3`}>
         <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
-          style={styles.inputPassword}
           placeholderTextColor="#aaa"
+          style={tw`flex-1 text-white py-3`}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Text style={{ color: '#fff' }}>
-            {showPassword ? 'Hide' : 'Show'}
-          </Text>
+          <Text style={tw`text-white`}>{showPassword ? 'Hide' : 'Show'}</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSignup}>
-        <Text style={styles.buttonText}>Daftar</Text>
+      <TouchableOpacity style={tw`bg-[#f6b042] py-4 rounded-xl items-center mt-2`} onPress={handleSignup}>
+        <Text style={tw`text-white font-bold`}>Daftar</Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#153932',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#1c2b3a',
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 10,
-    color: '#fff',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1c2b3a',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
-  inputPassword: {
-    flex: 1,
-    color: '#fff',
-    paddingVertical: 12,
-  },
-  button: {
-    backgroundColor: '#f6b042',
-    padding: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-});

@@ -1,127 +1,83 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, Image
+  View, Text, TextInput, TouchableOpacity, Image, Alert
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebaseConfig'; // sesuaikan path
+import tw from 'twrnc';
 
 export default function LoginScreen({ navigation }) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [storedUser, setStoredUser] = useState(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          setStoredUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error('Gagal mengambil data user:', error);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Gagal', 'Email dan password harus diisi!');
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        // Bisa simpan ke state global, context, atau AsyncStorage jika perlu
+        console.log('User data:', userData);
+
+        navigation.navigate('MainApp'); // arahkan ke halaman utama
+      } else {
+        Alert.alert('Gagal', 'Data pengguna tidak ditemukan di Firestore!');
       }
-    };
-
-    fetchUserData();
-  }, []);
-
-  const handleLogin = () => {
-    if (
-      storedUser &&
-      username === storedUser.username &&
-      password === storedUser.password
-    ) {
-      navigation.navigate('MainApp'); // pastikan 'Home' sesuai dengan nama screen di navigator
-    } else {
-      Alert.alert('Gagal', 'Username atau password salah!');
+    } catch (error) {
+      console.error('Login Error:', error);
+      Alert.alert('Gagal Login', error.message);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require('../../assets/delta.png')} style={styles.logo} />
-      <Text style={styles.title}>Masuk Akun</Text>
-      
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={styles.input}
-        placeholderTextColor="#aaa"
+    <View style={tw`flex-1 bg-[#153932] justify-center px-6`}>
+      <Image
+        source={require('../../assets/delta.png')}
+        style={tw`w-24 h-24 self-center mb-6`}
       />
-      
-      <View style={styles.passwordContainer}>
+      <Text style={tw`text-white text-2xl mb-4 text-center`}>Masuk Akun</Text>
+
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        placeholderTextColor="#aaa"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        style={tw`bg-[#1c2b3a] text-white px-4 py-3 mb-3 rounded-xl`}
+      />
+
+      <View style={tw`flex-row items-center bg-[#1c2b3a] rounded-xl px-4 mb-3`}>
         <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
-          style={styles.inputPassword}
           placeholderTextColor="#aaa"
+          style={tw`flex-1 text-white py-3`}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Text style={{ color: '#fff' }}>
+          <Text style={tw`text-white ml-2`}>
             {showPassword ? 'Hide' : 'Show'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity
+        style={tw`bg-[#f6b042] py-4 rounded-xl items-center mt-2`}
+        onPress={handleLogin}
+      >
+        <Text style={tw`text-white font-bold`}>Login</Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#153932',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#1c2b3a',
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 10,
-    color: '#fff',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1c2b3a',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
-  inputPassword: {
-    flex: 1,
-    color: '#fff',
-    paddingVertical: 12,
-  },
-  button: {
-    backgroundColor: '#f6b042',
-    padding: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-});
