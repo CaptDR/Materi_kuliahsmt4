@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from '../../tailwind';
-
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebaseConfig';
@@ -54,15 +53,15 @@ const OrderScreen = () => {
                                 ID Pesanan: {order.id}
                             </Text>
                             <Text style={tw`text-sm text-green-600`}>
-                                Tanggal: {order.date}
+                                Tanggal: {order.date?.toDate().toLocaleDateString('id-ID')}
                             </Text>
                             <Text
                                 style={tw`text-sm font-bold mt-2 ${order.status === 'Selesai'
                                     ? 'text-green-700'
                                     : order.status === 'Dikirim'
                                         ? 'text-yellow-600'
-                                        : 'text-red-600'
-                                    }`}
+                                        : 'text-red-600'}
+                `}
                             >
                                 Status: {order.status}
                             </Text>

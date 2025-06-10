@@ -47,7 +47,6 @@ const ProductScreen = () => {
         return;
       }
 
-      // Simpan pesanan awal ke Firestore
       const docRef = await addDoc(collection(db, 'orders'), {
         userId: user.uid,
         product: product.name,
@@ -56,7 +55,6 @@ const ProductScreen = () => {
         date: Timestamp.now(),
       });
 
-      // Navigasi ke halaman Checkout, kirim data produk dan orderId
       navigation.navigate('Checkout', {
         product,
         orderId: docRef.id,

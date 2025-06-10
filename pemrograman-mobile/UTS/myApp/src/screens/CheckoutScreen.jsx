@@ -28,7 +28,7 @@ const CheckoutScreen = () => {
       });
 
       Alert.alert('Sukses', 'Pesanan berhasil dibuat!');
-      navigation.navigate('HomeMain'); // balik ke Home
+      navigation.navigate('HomeMain');
     } catch (error) {
       console.error(error);
       Alert.alert('Gagal', 'Gagal menyimpan data checkout');

@@ -1,7 +1,8 @@
 // firebaseConfig.js
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getApps, initializeApp } from 'firebase/app';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
     apiKey: "AIzaSyBDc71X7fTO45pJCR2wXCa0q1QpvKFyjLY",
@@ -12,8 +13,13 @@ const firebaseConfig = {
     appId: "1:530756757187:android:d32d050c1ff7d1af966476"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+
+// Auth + persistence untuk React Native
+const auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+});
+
 const db = getFirestore(app);
 
-export { app, auth, db };
+export { auth, db };

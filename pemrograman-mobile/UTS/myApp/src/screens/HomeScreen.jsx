@@ -1,5 +1,6 @@
 import React from 'react';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { SafeAreaView, View, Text, Image, ScrollView, Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import tw from 'twrnc';
 
@@ -8,6 +9,7 @@ import ProductScreen from './ProductScreen';
 import OrderScreen from './OrderScreen';
 import ProfileScreen from './ProfileScreen';
 
+const { width } = Dimensions.get('window');
 const Tab = createBottomTabNavigator();
 
 export default function HomeScreen() {
